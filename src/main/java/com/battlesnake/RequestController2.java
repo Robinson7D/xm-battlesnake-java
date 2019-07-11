@@ -18,10 +18,14 @@ package com.battlesnake;
 
 import com.battlesnake.data.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class RequestController2 {
+
+    Logger logger = LoggerFactory.getLogger(RequestController2.class);
 
     private double FOOD_MODIFIER = 0.5;
 
@@ -53,6 +57,8 @@ public class RequestController2 {
 //        } else {
 //            return moveResponse.setMove(Move.DOWN).setTaunt("Oh Drat");
 //        }
+
+        logger.info(Arrays.deepToString(map));
             return moveResponse.setMove(getMove(request, mySnake, map, head)).setTaunt("???");
     }
 
