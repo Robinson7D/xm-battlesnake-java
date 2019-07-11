@@ -129,7 +129,7 @@ public class RequestController2 {
 
         // Don't hit snakes
         for (Snake snake : request.getSnakes()) {
-            for (int i = 0; i < snake.getCoords().length; i++) {
+            for (int i = 0; i < snake.getCoords().length - 1; i++) {
                 int[] p = snake.getCoords()[i];
                 map[p[0]][p[1]] = 0;
             }
