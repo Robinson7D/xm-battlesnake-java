@@ -18,23 +18,23 @@ package com.battlesnake;
 
 import com.battlesnake.data.*;
 import java.util.*;
-import jdk.internal.jline.internal.Log;
+import jdk.internal.util.xml.impl.Pair;
 import org.springframework.web.bind.annotation.*;
 
-//@RestController
-public class RequestController {
+@RestController
+public class RequestController2 {
 
-    int[][] map;
+    private double FOOD_MODIFIER = 0.5;
 
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
     public StartResponse start(@RequestBody StartRequest request) {
         return new StartResponse()
                 .setName("Jonny 5")
-                .setColor("#04B626")
+                .setColor("#FF3497")
                 .setHeadUrl("http://vignette1.wikia.nocookie.net/nintendo/images/6/61/Bowser_Icon.png/revision/latest?cb=20120820000805&path-prefix=en")
-                .setHeadType(HeadType.SMILE)
-                .setTailType(TailType.SKINNYTAIL)
-                .setTaunt("Number 5 is alive!");
+                .setHeadType(HeadType.DEAD)
+                .setTailType(TailType.PIXEL)
+                .setTaunt("I can find food!");
     }
 
     @RequestMapping(value="/move", method=RequestMethod.POST, produces = "application/json")
@@ -44,7 +44,8 @@ public class RequestController {
         Snake mySnake = findOurSnake(request); // kind of handy to have our snake at this level
         int[] head = mySnake.getCoords()[0];
 
-        map = getMap(request);
+        double[][] map = getMap(request);
+
 
 //        List<Move> towardsFoodMoves = moveTowardsFood(request, mySnake.getCoords()[0]);
         
@@ -53,9 +54,6 @@ public class RequestController {
 //        } else {
 //            return moveResponse.setMove(Move.DOWN).setTaunt("Oh Drat");
 //        }
-
-        Log.info(map);
-
             return moveResponse.setMove(getMove(request, mySnake, map, head)).setTaunt("???");
     }
 
@@ -66,31 +64,29 @@ public class RequestController {
         return responseObject;
     }
 
-    Move getMove(MoveRequest request, Snake mySnake, int[][] map, int[] head) {
-        Move foodMove = moveTowardsFood(request, mySnake.getCoords()[0]);
-        if (moveIsOk(map, head, foodMove)) {
+    Move getMove(MoveRequest request, Snake mySnake, double[][] map, int[] head) {
+        double topScore = 0;
+        Move move = Move.UP;
 
-        }
-
-//        for (Move foodMove : foodMoves) {
-//            if (moveIsOk(map, head, foodMove))
-//                return foodMove;
-//        }
-
-        for (Move move : Move.values()) {
-            if (moveIsOk(map, head, move)) {
-                return move;
+        for (Move thisMove : Move.values()) {
+            double score = getScore(map, head, move);
+            if (score > topScore){
+                topScore = score;
+                move = thisMove;
             }
         }
-
-        return Move.UP;
+        return move;
     }
 
-    int[][] getMap(MoveRequest request) {
-        int[][] map = new int[request.getWidth()][request.getHeight()];
-        for (int x = 0; x < request.getWidth(); x++) {
-            for (int y = 0; y < request.getHeight(); y++) {
-                map[x][y] = 1;
+    double[][] getMap(MoveRequest request) {
+        int width = request.getWidth();
+        int height = request.getHeight();
+
+        double[][] map = new double[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                map[x][y] = 1
+                        + (((width * height) - getDistanceFromFood(request, x, y)) / (width * height));
             }
         }
 
@@ -102,7 +98,23 @@ public class RequestController {
             }
         }
 
+
         return map;
+    }
+
+    double getScore(double[][] map, int[] head, Move move) {
+        if (move == Move.LEFT) {
+            return head[0] <= 0 ? 0 : map[head[0] - 1][head[1]];
+        }
+        if (move == Move.RIGHT) {
+            return head[0] < map.length - 1 ? map[head[0] + 1][head[1]] : 0;
+        }
+        if (move == Move.DOWN) {
+            return head[1] < map[0].length - 1 ? map[head[0]][head[1] + 1] : 0;
+        }
+        // UP
+        return head[1] > 0 ? map[head[0]][head[1] - 1] : 0;
+
     }
 
     boolean moveIsOk(int[][] map, int[] head, Move move) {
@@ -119,6 +131,20 @@ public class RequestController {
         return head[1] > 0 && map[head[0]][head[1] - 1] > 0;
     }
 
+    Move getValidMove(int[][] map, int[] head) {
+        if (head[0] > 0 && map[head[0] - 1][head[1]] > 0) {
+            return Move.LEFT;
+        }
+        if (head[0] < map.length - 1 && map[head[0] + 1][head[1]] > 0) {
+            return Move.RIGHT;
+        }
+        if (head[1] < map[0].length - 1 && map[head[0]][head[1] + 1] > 0) {
+            return Move.DOWN;
+        }
+        // UP
+        return Move.UP;
+    }
+
     /*
      *  Go through the snakes and find your team's snake
      *  
@@ -131,6 +157,11 @@ public class RequestController {
         return snakes.stream().filter(thisSnake -> thisSnake.getId().equals(myUuid)).findFirst().orElse(null);
     }
 
+    public double getDistanceFromFood(MoveRequest request, int x, int y) {
+        int[] firstFoodLocation = request.getFood()[0];
+        return Math.abs(firstFoodLocation[0] - x) + Math.abs(firstFoodLocation[1] - y);
+    }
+
     /*
      *  Simple algorithm to find food
      *  
@@ -138,24 +169,28 @@ public class RequestController {
      *  @param  request An integer array with the X,Y coordinates of your snake's head
      *  @return         A Move that gets you closer to food
      */    
-    public Move moveTowardsFood(MoveRequest request, int[] mySnakeHead) {
+    public ArrayList<Move> moveTowardsFood(MoveRequest request, int[] mySnakeHead) {
         ArrayList<Move> towardsFoodMoves = new ArrayList<>();
 
         int[] firstFoodLocation = request.getFood()[0];
 
-        int diffx = mySnakeHead[0] - firstFoodLocation[0];
-        int diffy = mySnakeHead[1] - firstFoodLocation[1];
+        if (firstFoodLocation[0] < mySnakeHead[0]) {
+            towardsFoodMoves.add(Move.LEFT);
+        }
 
-        Move hmove = (diffx > 0) ? Move.LEFT : Move.RIGHT;
-        Move vmove = (diffy > 0) ? Move.UP : Move.DOWN;
+        if (firstFoodLocation[0] > mySnakeHead[0]) {
+            towardsFoodMoves.add(Move.RIGHT);
+        }
 
-        Move preferred = Math.abs(diffx) > Math.abs(diffy) ? hmove : vmove;
+        if (firstFoodLocation[1] < mySnakeHead[1]) {
+            towardsFoodMoves.add(Move.UP);
+        }
 
-        return preferred;
-    }
+        if (firstFoodLocation[1] > mySnakeHead[1]) {
+            towardsFoodMoves.add(Move.DOWN);
+        }
 
-    private void updateMoveWithMap(Move move, int score) {
-
+        return towardsFoodMoves;
     }
 
 }
