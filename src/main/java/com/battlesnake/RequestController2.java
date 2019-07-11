@@ -61,7 +61,7 @@ public class RequestController2 {
     int[] head = mySnake.getCoords()[0];
 
     double[][] map = getMap(request);
-    considerRooms(map, head, null, true);
+    considerRooms(map, head, null, true, null);
 
     // List<Move> towardsFoodMoves = moveTowardsFood(request,
     // mySnake.getCoords()[0]);
