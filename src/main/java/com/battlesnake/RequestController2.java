@@ -28,9 +28,9 @@ public class RequestController2 {
 
   Logger logger = LoggerFactory.getLogger(RequestController2.class);
 
-  private double FOOD_WEIGHT = 1.5;
+  private double FOOD_WEIGHT = 2;
   private double OPEN_SPACE_WEIGHT = 1.25;
-  private double ENEMY_HEAD_PREDICTION_WEIGHT = 1.5;
+  private double ENEMY_HEAD_PREDICTION_WEIGHT = 2;
 
   private String[] taunts = { "Life is not a malfunction.", "Attractive. Nice software. Hmmmm.",
       "Hey, laser lips, your mama was a snow blower.", "Number 5 is alive.", "Ho ho ho ho ho ho ho ho ho ho ho!",
@@ -148,7 +148,7 @@ public class RequestController2 {
 
     void updateMapForEnemyHeads(double[][] map, Snake enemy, Snake us) {
         boolean wereLarger = us.getCoords().length > enemy.getCoords().length;
-        double modifier = ENEMY_HEAD_PREDICTION_WEIGHT * (wereLarger ? 1 : -1);
+        double modifier = ENEMY_HEAD_PREDICTION_WEIGHT * (wereLarger ? 1 : 0.5);
 
         int [] enemyHead = enemy.getCoords()[0];
         if (enemyHead[0] > 0) {
