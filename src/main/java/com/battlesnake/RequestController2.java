@@ -70,28 +70,33 @@ public class RequestController2 {
     }
 
     Move getMove(MoveRequest request, Snake mySnake, double[][] map, int[] head) {
-        double topScore = 0;
+        double topScore = -100000;
         Move move = Move.UP;
 
         for (Move thisMove : Move.values()) {
             double score = getScore(map, head, move);
+            logger.info("<><><><> MOVE: " + thisMove.getName() + " has score: " + score + " TOP SCORE CURRENTLY: " + topScore);
             if (score > topScore){
                 topScore = score;
                 move = thisMove;
+                logger.info("<><><><> NEW TOP SCORE! " + thisMove.getName());
             }
         }
+        logger.info("<><><><> Final preference: " + move.getName());
         return move;
     }
 
     double[][] getMap(MoveRequest request) {
         int width = request.getWidth();
         int height = request.getHeight();
+        int area = width * height;
 
+        // Initialize based on food:
         double[][] map = new double[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 map[x][y] = 1
-                        + (((width * height) - getDistanceFromFood(request, x, y)) / (width * height));
+                        + Math.abs((area - getDistanceFromFood(request, x, y)) / area);
             }
         }
 
@@ -102,6 +107,17 @@ public class RequestController2 {
                 map[p[0]][p[1]] = 0;
             }
         }
+//
+//        // Add score based on open space:
+//        for (int x = 0; x < width; x++) {
+//            for (int y = 0; y < height; y++) {
+//                if (map[x][y] > 0) {
+//
+//                }
+//                map[x][y] = 1
+//                        + Math.abs((area - getDistanceFromFood(request, x, y)) / area);
+//            }
+//        }
 
 
         return map;
@@ -109,7 +125,7 @@ public class RequestController2 {
 
     double getScore(double[][] map, int[] head, Move move) {
         if (move == Move.LEFT) {
-            return head[0] <= 0 ? 0 : map[head[0] - 1][head[1]];
+            return head[0] > 0 ? map[head[0] - 1][head[1]] : 0;
         }
         if (move == Move.RIGHT) {
             return head[0] < map.length - 1 ? map[head[0] + 1][head[1]] : 0;
