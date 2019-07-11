@@ -61,6 +61,7 @@ public class RequestController2 {
     int[] head = mySnake.getCoords()[0];
 
     double[][] map = getMap(request);
+    considerRooms(map, head, null, true);
 
     // List<Move> towardsFoodMoves = moveTowardsFood(request,
     // mySnake.getCoords()[0]);
@@ -133,13 +134,14 @@ public class RequestController2 {
     }
 
     // Add score based on open space:
-    for (int x = 0; x < width; x++) {
-      for (int y = 0; y < height; y++) {
-        if (map[x][y] > 0) {
-          map[x][y] += (getDistanceFromWall(map, x, y) * OPEN_SPACE_WEIGHT);
-        }
-      }
-    }
+//    for (int x = 0; x < width; x++) {
+//      for (int y = 0; y < height; y++) {
+//        if (map[x][y] > 0) {
+//          map[x][y] += (getDistanceFromWall(map, x, y) * OPEN_SPACE_WEIGHT);
+//        }
+//      }
+//    }
+
 
     return map;
   }
@@ -163,7 +165,41 @@ public class RequestController2 {
         }
     }
 
-  double getScore(double[][] map, int[] head, Move move) {
+
+    final double RELATIVE_OPEN_SPACE_WEIGHT = 0.01;
+    void considerRooms(double[][] map, int[] point, int[] incrementPoint, boolean initial) {
+        if (!initial) {
+            map[incrementPoint[0]][incrementPoint[1]] += RELATIVE_OPEN_SPACE_WEIGHT;
+        }
+        int[] next;
+        next = new int[]{point[0]+1, point[1]};
+        if (considerRoomsPointIsValid(map, next, point)) {
+            considerRooms(map, next, initial ? next : incrementPoint, false);
+        }
+        next = new int[]{point[0]-1, point[1]};
+        if (considerRoomsPointIsValid(map, next, point)) {
+            considerRooms(map, next, initial ? next : incrementPoint, false);
+        }
+        next = new int[]{point[0], point[1]+1};
+        if (considerRoomsPointIsValid(map, next, point)) {
+            considerRooms(map, next, initial ? next : incrementPoint, false);
+        }
+        next = new int[]{point[0], point[1]-1};
+        if (considerRoomsPointIsValid(map, next, point)) {
+            considerRooms(map, next, initial ? next : incrementPoint, false);
+        }
+    }
+    boolean considerRoomsPointIsValid(double[][] map, int[] next, int[] previousPoint) {
+        return !(next[0] == previousPoint[0] && next[1] == previousPoint[1])
+                && next[0] >= 0
+                && next[0] < map.length
+                && next[1] >= 0
+                && next[1] < map[0].length
+                && map[next[0]][next[1]] > 0;
+    }
+
+
+    double getScore(double[][] map, int[] head, Move move) {
     if (move == Move.LEFT) {
       return (head[0] > 0) ? map[head[0] - 1][head[1]] : 0;
     }
