@@ -18,7 +18,6 @@ package com.battlesnake;
 
 import com.battlesnake.data.*;
 import java.util.*;
-import jdk.internal.util.xml.impl.Pair;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
