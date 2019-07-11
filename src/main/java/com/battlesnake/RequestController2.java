@@ -167,26 +167,28 @@ public class RequestController2 {
 
 
     final double RELATIVE_OPEN_SPACE_WEIGHT = 0.01;
-    void considerRooms(double[][] map, int[] point, int[] incrementPoint, boolean initial) {
+    void considerRooms(double[][] map, int[] point, int[] incrementPoint, boolean initial, boolean[][] considered) {
         if (!initial) {
             map[incrementPoint[0]][incrementPoint[1]] += RELATIVE_OPEN_SPACE_WEIGHT;
+
         }
+        considered[incrementPoint[0]][incrementPoint[1]] = true;
         int[] next;
         next = new int[]{point[0]+1, point[1]};
-        if (considerRoomsPointIsValid(map, next, point)) {
-            considerRooms(map, next, initial ? next : incrementPoint, false);
+        if (considerRoomsPointIsValid(map, next, point) && !considered[next[0]][next[1]]) {
+            considerRooms(map, next, initial ? next : incrementPoint, false, initial ? new boolean[map.length][map[0].length] : considered);
         }
         next = new int[]{point[0]-1, point[1]};
-        if (considerRoomsPointIsValid(map, next, point)) {
-            considerRooms(map, next, initial ? next : incrementPoint, false);
+        if (considerRoomsPointIsValid(map, next, point) && !considered[next[0]][next[1]]) {
+            considerRooms(map, next, initial ? next : incrementPoint, false, initial ? new boolean[map.length][map[0].length] : considered);
         }
         next = new int[]{point[0], point[1]+1};
-        if (considerRoomsPointIsValid(map, next, point)) {
-            considerRooms(map, next, initial ? next : incrementPoint, false);
+        if (considerRoomsPointIsValid(map, next, point) && !considered[next[0]][next[1]]) {
+            considerRooms(map, next, initial ? next : incrementPoint, false, initial ? new boolean[map.length][map[0].length] : considered);
         }
         next = new int[]{point[0], point[1]-1};
-        if (considerRoomsPointIsValid(map, next, point)) {
-            considerRooms(map, next, initial ? next : incrementPoint, false);
+        if (considerRoomsPointIsValid(map, next, point) && !considered[next[0]][next[1]]) {
+            considerRooms(map, next, initial ? next : incrementPoint, false, initial ? new boolean[map.length][map[0].length] : considered);
         }
     }
     boolean considerRoomsPointIsValid(double[][] map, int[] next, int[] previousPoint) {
