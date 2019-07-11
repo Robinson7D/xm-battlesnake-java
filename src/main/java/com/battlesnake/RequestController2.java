@@ -115,7 +115,6 @@ public class RequestController2 {
             for (int y = 0; y < height; y++) {
                 if (map[x][y] > 0) {
                     double openSpaceScore = Math.abs(getDistanceFromWall(map, x, y) / (width * height));
-                    OPEN_SPACE_WEIGHT
                     map[x][y] += (openSpaceScore * OPEN_SPACE_WEIGHT);
                 }
             }
