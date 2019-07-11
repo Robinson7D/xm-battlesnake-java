@@ -125,16 +125,17 @@ public class RequestController2 {
 
     double getScore(double[][] map, int[] head, Move move) {
         if (move == Move.LEFT) {
-            return head[0] > 0 ? map[head[0] - 1][head[1]] : 0;
+            logger.info(">>>> LEFT ATTEMPT: " + (head[0] > 0) + " so: " + ((head[0] > 0) ? map[head[0] - 1][head[1]] : 0));
+            return (head[0] > 0) ? map[head[0] - 1][head[1]] : 0;
         }
         if (move == Move.RIGHT) {
-            return head[0] < map.length - 1 ? map[head[0] + 1][head[1]] : 0;
+            return (head[0] < map.length - 1) ? map[head[0] + 1][head[1]] : 0;
         }
         if (move == Move.DOWN) {
-            return head[1] < map[0].length - 1 ? map[head[0]][head[1] + 1] : 0;
+            return (head[1] < map[0].length - 1) ? map[head[0]][head[1] + 1] : 0;
         }
         // UP
-        return head[1] > 0 ? map[head[0]][head[1] - 1] : 0;
+        return (head[1] > 0) ? map[head[0]][head[1] - 1] : 0;
 
     }
 
