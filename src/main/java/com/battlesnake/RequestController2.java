@@ -21,6 +21,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import java.util.Random;
 
 @RestController
 public class RequestController2 {
@@ -29,6 +30,23 @@ public class RequestController2 {
 
     private double FOOD_WEIGHT = 1;
     private double OPEN_SPACE_WEIGHT = 1;
+
+    private String[] taunts = {
+      "Life is not a malfunction.",
+      "Attractive. Nice software. Hmmmm.",
+      "Hey, laser lips, your mama was a snow blower.",
+      "Number 5 is alive.",
+      "Ho ho ho ho ho ho ho ho ho ho ho!",
+      "Hee hee hee hee hee hee hee hee hee!",
+      "Nyuk, nyuk nyuk nyuk nyuk nyuk nyuk nyuk nyuk!",
+      "Program say to kill, to disassemble, to make dead. Number 5 cannot.",
+      "Verdict: starvation to death.",
+      "Snake. Target. Nevermore.",
+      "No disassemble Number Five!",
+      "Number 5 stupid name... want to be Troy or Nick!",
+      "Frankie, you broke the unwritten law.",
+      "Come on, treads, don't fail me now!",
+    }
 
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
     public StartResponse start(@RequestBody StartRequest request) {
@@ -44,7 +62,13 @@ public class RequestController2 {
     @RequestMapping(value="/move", method=RequestMethod.POST, produces = "application/json")
     public MoveResponse move(@RequestBody MoveRequest request) {
         MoveResponse moveResponse = new MoveResponse();
-        
+
+        // change taunt every 20 moves
+        if (request.turn % 20 == 0) {
+          Random rand = new Random();
+          int tauntNumber = rand.nextInt(taunts.length - 1);
+          moveResponse.setTaunt(tauntNumber);
+        }
         Snake mySnake = findOurSnake(request); // kind of handy to have our snake at this level
         int[] head = mySnake.getCoords()[0];
 
@@ -52,7 +76,7 @@ public class RequestController2 {
 
 
 //        List<Move> towardsFoodMoves = moveTowardsFood(request, mySnake.getCoords()[0]);
-        
+
 //        if (towardsFoodMoves != null && !towardsFoodMoves.isEmpty()) {
 //            return moveResponse.setMove(towardsFoodMoves.get(0)).setTaunt("I'm hungry");
 //        } else {
@@ -60,7 +84,7 @@ public class RequestController2 {
 //        }
 
         logger.info(Arrays.deepToString(map));
-            return moveResponse.setMove(getMove(request, mySnake, map, head)).setTaunt("???");
+        return moveResponse.setMove(getMove(request, mySnake, map, head));
     }
 
     @RequestMapping(value="/end", method=RequestMethod.POST)
@@ -168,7 +192,7 @@ public class RequestController2 {
 
     /*
      *  Go through the snakes and find your team's snake
-     *  
+     *
      *  @param  request The MoveRequest from the server
      *  @return         Your team's snake
      */
@@ -208,11 +232,11 @@ public class RequestController2 {
 
     /*
      *  Simple algorithm to find food
-     *  
+     *
      *  @param  request The MoveRequest from the server
      *  @param  request An integer array with the X,Y coordinates of your snake's head
      *  @return         A Move that gets you closer to food
-     */    
+     */
     public ArrayList<Move> moveTowardsFood(MoveRequest request, int[] mySnakeHead) {
         ArrayList<Move> towardsFoodMoves = new ArrayList<>();
 
