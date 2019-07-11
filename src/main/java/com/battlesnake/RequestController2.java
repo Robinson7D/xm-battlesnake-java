@@ -29,8 +29,8 @@ public class RequestController2 {
   Logger logger = LoggerFactory.getLogger(RequestController2.class);
 
   private double FOOD_WEIGHT = 1;
-  private double OPEN_SPACE_WEIGHT = 0.5;
-  private double ENEMY_HEAD_PREDICTION_WEIGHT = 0.5;
+  private double OPEN_SPACE_WEIGHT = 1.25;
+  private double ENEMY_HEAD_PREDICTION_WEIGHT = 0.8;
 
   private String[] taunts = { "Life is not a malfunction.", "Attractive. Nice software. Hmmmm.",
       "Hey, laser lips, your mama was a snow blower.", "Number 5 is alive.", "Ho ho ho ho ho ho ho ho ho ho ho!",
