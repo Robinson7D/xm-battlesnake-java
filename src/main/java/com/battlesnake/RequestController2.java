@@ -74,7 +74,7 @@ public class RequestController2 {
         Move move = Move.UP;
 
         for (Move thisMove : Move.values()) {
-            double score = getScore(map, head, move);
+            double score = getScore(map, head, thisMove);
             logger.info("<><><><> MOVE: " + thisMove.getName() + " has score: " + score + " TOP SCORE CURRENTLY: " + topScore);
             if (score > topScore){
                 topScore = score;
