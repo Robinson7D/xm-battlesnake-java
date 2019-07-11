@@ -27,7 +27,7 @@ public class RequestController2 {
 
     Logger logger = LoggerFactory.getLogger(RequestController2.class);
 
-    private double FOOD_WEIGHT = 1.5;
+    private double FOOD_WEIGHT = 1;
     private double OPEN_SPACE_WEIGHT = 0.5;
 
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
@@ -227,7 +227,7 @@ public class RequestController2 {
             }
         }
 
-        return (area * (largestDistanceX * largestDistanceY)) / area;
+        return (largestDistanceX * largestDistanceY) / area;
     }
 
     /*
