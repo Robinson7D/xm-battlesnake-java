@@ -43,9 +43,9 @@ public class RequestController2 {
 
   @RequestMapping(value = "/start", method = RequestMethod.POST, produces = "application/json")
   public StartResponse start(@RequestBody StartRequest request) {
-    return new StartResponse().setName("Jonny 5").setColor("#FF3497")
+    return new StartResponse().setName("Jonny 5").setColor("#04B626")
         .setHeadUrl("https://66.media.tumblr.com/tumblr_m9yt1tExMO1qkpvmmo1_400.jpg").setHeadType(HeadType.DEAD)
-        .setTailType(TailType.PIXEL).setTaunt("I can find food!");
+        .setTailType(TailType.PIXEL).setTaunt("Waiting...");
   }
 
   @RequestMapping(value = "/move", method = RequestMethod.POST, produces = "application/json")
