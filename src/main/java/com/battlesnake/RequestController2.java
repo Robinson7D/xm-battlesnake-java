@@ -27,7 +27,8 @@ public class RequestController2 {
 
     Logger logger = LoggerFactory.getLogger(RequestController2.class);
 
-    private double FOOD_MODIFIER = 0.5;
+    private double FOOD_WEIGHT = 1;
+    private double OPEN_SPACE_WEIGHT = 1;
 
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
     public StartResponse start(@RequestBody StartRequest request) {
@@ -95,8 +96,9 @@ public class RequestController2 {
         double[][] map = new double[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
+                double foodScore = Math.abs((area - getDistanceFromFood(request, x, y)) / area);
                 map[x][y] = 1
-                        + Math.abs((area - getDistanceFromFood(request, x, y)) / area);
+                        + (foodScore * FOOD_WEIGHT);
             }
         }
 
@@ -107,25 +109,23 @@ public class RequestController2 {
                 map[p[0]][p[1]] = 0;
             }
         }
-//
-//        // Add score based on open space:
-//        for (int x = 0; x < width; x++) {
-//            for (int y = 0; y < height; y++) {
-//                if (map[x][y] > 0) {
-//
-//                }
-//                map[x][y] = 1
-//                        + Math.abs((area - getDistanceFromFood(request, x, y)) / area);
-//            }
-//        }
 
+        // Add score based on open space:
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x][y] > 0) {
+                    double openSpaceScore = Math.abs(getDistanceFromWall(map, x, y) / (width * height));
+                    OPEN_SPACE_WEIGHT
+                    map[x][y] += (openSpaceScore * OPEN_SPACE_WEIGHT);
+                }
+            }
+        }
 
         return map;
     }
 
     double getScore(double[][] map, int[] head, Move move) {
         if (move == Move.LEFT) {
-            logger.info(">>>> LEFT ATTEMPT: " + (head[0] > 0) + " so: " + ((head[0] > 0) ? map[head[0] - 1][head[1]] : 0));
             return (head[0] > 0) ? map[head[0] - 1][head[1]] : 0;
         }
         if (move == Move.RIGHT) {
@@ -182,6 +182,29 @@ public class RequestController2 {
     public double getDistanceFromFood(MoveRequest request, int x, int y) {
         int[] firstFoodLocation = request.getFood()[0];
         return Math.abs(firstFoodLocation[0] - x) + Math.abs(firstFoodLocation[1] - y);
+    }
+
+    public double getDistanceFromWall(double[][] map, int itemX, int itemY) {
+        int width = map.length;
+        int height = map[0].length;
+        int smallestDistance = width * height;
+
+        // Add score based on open space:
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x][y] == 0) {
+                    int distance = Math.abs(x - itemX) + Math.abs(y - itemY);
+                    if (distance <= 1) {
+                        return distance;
+                    }
+                    if (distance < smallestDistance) {
+                        smallestDistance = distance;
+                    }
+                }
+            }
+        }
+
+        return smallestDistance;
     }
 
     /*
