@@ -198,7 +198,7 @@ public class RequestController2 {
                 largestDistanceX = i;
             }
         }
-        for (int i = itemX + 1; i < width; i++) {
+        for (int i = itemX + 1; i < width - 1; i++) {
             int x = itemX + i;
             if (map[x][itemY] == 0) {
                 break;
@@ -217,7 +217,7 @@ public class RequestController2 {
                 largestDistanceY = i;
             }
         }
-        for (int i = itemX + 1; i < height; i++) {
+        for (int i = itemX + 1; i < height - 1; i++) {
             int y = itemY + i;
             if (map[itemX][y] == 0) {
                 break;
