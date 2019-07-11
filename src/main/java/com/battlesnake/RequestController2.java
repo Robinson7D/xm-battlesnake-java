@@ -48,6 +48,8 @@ public class RequestController2 {
       "Come on, treads, don't fail me now!",
     };
 
+    private int currentTaunt = 0;
+
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
     public StartResponse start(@RequestBody StartRequest request) {
         return new StartResponse()
@@ -66,8 +68,7 @@ public class RequestController2 {
         // change taunt every 20 moves
         if (request.getTurn() % 20 == 0) {
           Random rand = new Random();
-          int tauntNumber = rand.nextInt(taunts.length - 1);
-          moveResponse.setTaunt(taunts[tauntNumber]);
+          currentTaunt = rand.nextInt(taunts.length - 1);
         }
         Snake mySnake = findOurSnake(request); // kind of handy to have our snake at this level
         int[] head = mySnake.getCoords()[0];
@@ -84,7 +85,7 @@ public class RequestController2 {
 //        }
 
         logger.info(Arrays.deepToString(map));
-        return moveResponse.setMove(getMove(request, mySnake, map, head));
+        return moveResponse.setMove(getMove(request, mySnake, map, head)).setTaunt(taunts[currentTaunt]);
     }
 
     @RequestMapping(value="/end", method=RequestMethod.POST)
