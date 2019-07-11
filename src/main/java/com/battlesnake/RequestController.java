@@ -18,7 +18,6 @@ package com.battlesnake;
 
 import com.battlesnake.data.*;
 import java.util.*;
-import jdk.internal.jline.internal.Log;
 import org.springframework.web.bind.annotation.*;
 
 //@RestController
@@ -54,7 +53,7 @@ public class RequestController {
 //            return moveResponse.setMove(Move.DOWN).setTaunt("Oh Drat");
 //        }
 
-        Log.info(map);
+//        Log.info(map);
 
             return moveResponse.setMove(getMove(request, mySnake, map, head)).setTaunt("???");
     }
