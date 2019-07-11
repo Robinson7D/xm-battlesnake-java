@@ -114,8 +114,7 @@ public class RequestController2 {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 if (map[x][y] > 0) {
-                    double openSpaceScore = Math.abs(getDistanceFromWall(map, x, y) / (width * height));
-                    map[x][y] += (openSpaceScore * OPEN_SPACE_WEIGHT);
+                    map[x][y] += (getDistanceFromWall(map, x, y) * OPEN_SPACE_WEIGHT);
                 }
             }
         }
@@ -186,24 +185,49 @@ public class RequestController2 {
     public double getDistanceFromWall(double[][] map, int itemX, int itemY) {
         int width = map.length;
         int height = map[0].length;
-        int smallestDistance = width * height;
+        int area = width * height;
+        int largestDistanceX = 0;
+        int largestDistanceY = 0;
 
-        // Add score based on open space:
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (map[x][y] == 0) {
-                    int distance = Math.abs(x - itemX) + Math.abs(y - itemY);
-                    if (distance <= 1) {
-                        return distance;
-                    }
-                    if (distance < smallestDistance) {
-                        smallestDistance = distance;
-                    }
-                }
+        for (int i = 1; i < itemX; i++) {
+            int x = itemX - i;
+            if (map[x][itemY] == 0) {
+                break;
+            }
+            else if (i > largestDistanceX) {
+                largestDistanceX = i;
+            }
+        }
+        for (int i = itemX + 1; i < width; i++) {
+            int x = itemX + i;
+            if (map[x][itemY] == 0) {
+                break;
+            }
+            else if (i > largestDistanceX) {
+                largestDistanceX = i;
             }
         }
 
-        return smallestDistance;
+        for (int i = 1; i < itemY; i++) {
+            int y = itemY - i;
+            if (map[itemX][y] == 0) {
+                break;
+            }
+            else if (i > largestDistanceY) {
+                largestDistanceY = i;
+            }
+        }
+        for (int i = itemX + 1; i < height; i++) {
+            int y = itemY + i;
+            if (map[itemX][y] == 0) {
+                break;
+            }
+            else if (i > largestDistanceY) {
+                largestDistanceY = i;
+            }
+        }
+
+        return (area * (largestDistanceX * largestDistanceY)) / area;
     }
 
     /*
