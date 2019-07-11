@@ -46,7 +46,7 @@ public class RequestController2 {
       "Number 5 stupid name... want to be Troy or Nick!",
       "Frankie, you broke the unwritten law.",
       "Come on, treads, don't fail me now!",
-    }
+    };
 
     @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
     public StartResponse start(@RequestBody StartRequest request) {
@@ -64,10 +64,10 @@ public class RequestController2 {
         MoveResponse moveResponse = new MoveResponse();
 
         // change taunt every 20 moves
-        if (request.turn % 20 == 0) {
+        if (request.getTurn() % 20 == 0) {
           Random rand = new Random();
           int tauntNumber = rand.nextInt(taunts.length - 1);
-          moveResponse.setTaunt(tauntNumber);
+          moveResponse.setTaunt(taunts[tauntNumber]);
         }
         Snake mySnake = findOurSnake(request); // kind of handy to have our snake at this level
         int[] head = mySnake.getCoords()[0];
