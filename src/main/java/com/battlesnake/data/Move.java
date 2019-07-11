@@ -24,8 +24,18 @@ public enum Move {
   LEFT,
   RIGHT;
 
+  private double score = 0;
+
   @JsonValue
   public String getName() {
     return name().toLowerCase();
+  }
+
+  public double getScore() {
+    return score;
+  }
+
+  public void setScore(double score) {
+    this.score = score;
   }
 }
