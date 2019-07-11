@@ -30,6 +30,7 @@ public class RequestController2 {
 
   private double FOOD_WEIGHT = 1;
   private double OPEN_SPACE_WEIGHT = 0.5;
+  private double ENEMY_HEAD_PREDICTION_WEIGHT = 0.5;
 
   private String[] taunts = { "Life is not a malfunction.", "Attractive. Nice software. Hmmmm.",
       "Hey, laser lips, your mama was a snow blower.", "Number 5 is alive.", "Ho ho ho ho ho ho ho ho ho ho ho!",
@@ -113,13 +114,21 @@ public class RequestController2 {
       }
     }
 
+    Snake mySnake = findOurSnake(request);
+
     // Don't hit snakes
     for (Snake snake : request.getSnakes()) {
-      for (int i = 0; i < snake.getCoords().length; i++) {
-        int[] p = snake.getCoords()[i];
-        if (!(snake.getId() == request.getYou() && i == snake.getCoords().length - 1)) {
-          map[p[0]][p[1]] = 0;
-        }
+      int [][] coords = snake.getCoords();
+
+      for (int i = 0; i <coords.length; i++) {
+          int[] p = coords[i];
+          if (!(snake.getId() == request.getYou() && i == coords.length - 1)) {
+              map[p[0]][p[1]] = 0;
+          }
+      }
+
+      if (snake != mySnake) {
+          updateMapForEnemyHeads(map, snake, mySnake);
       }
     }
 
@@ -134,6 +143,25 @@ public class RequestController2 {
 
     return map;
   }
+
+    void updateMapForEnemyHeads(double[][] map, Snake enemy, Snake us) {
+        boolean wereLarger = us.getCoords().length > enemy.getCoords().length;
+        double modifier = ENEMY_HEAD_PREDICTION_WEIGHT * (wereLarger ? 1 : -1);
+
+        int [] enemyHead = enemy.getCoords()[0];
+        if (enemyHead[0] > 0) {
+            map[enemyHead[0] - 1][enemyHead[1]] *= modifier;
+        }
+        if (enemyHead[0] < map.length - 1) {
+            map[enemyHead[0] + 1][enemyHead[1]] *= modifier;
+        }
+        if (enemyHead[1] > 0) {
+            map[enemyHead[0]][enemyHead[1] - 1] *= modifier;
+        }
+        if (enemyHead[1] < map[0].length - 1) {
+            map[enemyHead[0]][enemyHead[1] + 1] *= modifier;
+        }
+    }
 
   double getScore(double[][] map, int[] head, Move move) {
     if (move == Move.LEFT) {
