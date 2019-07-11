@@ -198,13 +198,13 @@ public class RequestController2 {
                 largestDistanceX = i;
             }
         }
-        for (int i = itemX + 1; i < width - 1; i++) {
-            int x = itemX + i;
+        for (int x = itemX + 1; x < width - 1; x++) {
             if (map[x][itemY] == 0) {
                 break;
             }
-            else if (i > largestDistanceX) {
-                largestDistanceX = i;
+            int dist = x - itemX;
+            if (dist > largestDistanceX) {
+                largestDistanceX = dist;
             }
         }
 
@@ -217,13 +217,13 @@ public class RequestController2 {
                 largestDistanceY = i;
             }
         }
-        for (int i = itemY + 1; i < height - 1; i++) {
-            int y = itemY + i;
+        for (int y = itemY + 1; y < height - 1; y++) {
             if (map[itemX][y] == 0) {
                 break;
             }
-            else if (i > largestDistanceY) {
-                largestDistanceY = i;
+            int dist = y - itemY;
+            if (dist > largestDistanceY) {
+                largestDistanceY = dist;
             }
         }
 
